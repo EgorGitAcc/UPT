@@ -24,6 +24,7 @@ const NewsPage = () => {
             alignItems="center" 
             justifyContent="center" 
             padding={3}
+            marginTop="20px"
         >
             <Typography variant="h4" gutterBottom>
                 Новости

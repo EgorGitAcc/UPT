@@ -5,8 +5,8 @@ import { Outlet, Link } from 'react-router-dom';
 
 const ClientMain = () => {
     return (
-        <Box>
-            <AppBar position="static" color="primary">
+        <Box height="100%">
+            <AppBar position="fixed" color="primary">
                 <Toolbar>
                     <Box display="flex" flexGrow={1} gap={2}>
                         <Button component={Link} to="news" color="inherit">
@@ -33,7 +33,7 @@ const ClientMain = () => {
                 </Toolbar>
             </AppBar>
 
-            <Box padding={3}>
+            <Box padding={3} height="100%">
                 <Outlet />
             </Box>
         </Box>
