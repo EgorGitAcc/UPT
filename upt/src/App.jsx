@@ -5,7 +5,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import RoleSelection from './pages/RoleSelection';
 import ClientInfo from './pages/ClinetsPages/ClientInfo';
-import ClientMain from './pages/ClinetsPages/ClientsMain';
+import ClientMain from './pages/ClinetsPage/ClientsMain';
+import ClientNews from './pages/ClinetsPage/ClientsNews';
+
 
 const App = () => {
   return (
@@ -18,7 +20,9 @@ const App = () => {
 
         {/*Страницы клиента*/}
         <Route path="/client-info" element={<ClientInfo />} />
-        <Route path="/client-main" element={<ClientMain />} />
+        <Route path="/client-main" element={<ClientMain />}>
+          <Route path="news" element={<ClientNews />} />
+        </Route>
       </Routes>
     </Router>
   );

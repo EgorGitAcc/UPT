@@ -1,32 +1,41 @@
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Button, Box } from '@mui/material';
 import { Notifications, ExitToApp } from '@mui/icons-material';
+import { Outlet, Link } from 'react-router-dom';
 
 const ClientMain = () => {
     return (
         <Box>
-            {/* Header Section */}
             <AppBar position="static" color="primary">
                 <Toolbar>
-                    {/* Navigation Menu */}
                     <Box display="flex" flexGrow={1} gap={2}>
-                        <Button color="inherit">Новости</Button>
-                        <Button color="inherit">Программы</Button>
-                        <Button color="inherit">Тренера</Button>
-                        <Button color="inherit">Профиль</Button>
+                        <Button component={Link} to="news" color="inherit">
+                            Новости
+                        </Button>
+                        <Button component={Link} to="programs" color="inherit">
+                            Программы
+                        </Button>
+                        <Button component={Link} to="trainers" color="inherit">
+                            Тренера
+                        </Button>
+                        <Button component={Link} to="profile" color="inherit">
+                            Профиль
+                        </Button>
                     </Box>
 
-                    {/* Notifications Button */}
                     <IconButton color="inherit">
                         <Notifications />
                     </IconButton>
 
-                    {/* Logout Button */}
                     <IconButton color="inherit">
                         <ExitToApp />
                     </IconButton>
                 </Toolbar>
             </AppBar>
+
+            <Box padding={3}>
+                <Outlet />
+            </Box>
         </Box>
     );
 };
