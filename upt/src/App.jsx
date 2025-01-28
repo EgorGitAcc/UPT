@@ -8,7 +8,7 @@ import ClientInfo from './pages/ClinetsPage/ClientInfo';
 import ClientMain from './pages/ClinetsPage/ClientsMain';
 import ClientNews from './pages/ClinetsPage/ClientsNews';
 import ClientProgram from './pages/ClinetsPage/ClinetProgram'
-import ClientMap from './pages/ClinetsPage/ClientMap';
+import ClientMap from './pages/ClinetsPage/ClinetMap';
 
 const App = () => {
   return (
@@ -25,7 +25,7 @@ const App = () => {
         <Route path="/client-main" element={<ClientMain />}>
           <Route path="news" element={<ClientNews />} />
           <Route path='programs' element={<ClientProgram />} />
-          <Route path='map' element={<ClientMap/>}/>
+          <Route path='map' element={<ClientMap />} />
         </Route>
       </Routes>
     </Router>

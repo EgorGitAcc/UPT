@@ -1,5 +1,5 @@
-// src/pages/Workouts.jsx
 import React, { useState } from 'react';
+import { Link as RouterLink, Link } from 'react-router-dom'; // Импортируем Link
 import {
     Box,
     Typography,
@@ -25,7 +25,6 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
-import { Link as RouterLink } from 'react-router-dom';
 
 const goals = [
     {
@@ -69,7 +68,7 @@ const Workouts = () => {
     };
 
     const handleSearchGoal = (goal) => {
-        
+
     };
 
     const handleNext = () => {
@@ -358,16 +357,17 @@ const Workouts = () => {
                                 }
                             />
                             <ListItemSecondaryAction>
-                                <IconButton
-                                    edge="end"
-                                    aria-label="search"
-                                    color='primary'
-                                    to="/map"
-                                    onClick={() => handleSearchGoal(goal)}
-                                    sx={{ mr: 1 }}
-                                >
-                                    <SearchIcon />
-                                </IconButton>
+                                <Link to="/client-main/map" style={{ textDecoration: 'none' }}>
+                                    <IconButton
+                                        edge="end"
+                                        aria-label="search"
+                                        color='primary'
+                                        onClick={() => handleSearchGoal(goal)}
+                                        sx={{ mr: 1 }}
+                                    >
+                                        <SearchIcon />
+                                    </IconButton>
+                                </Link>
                                 <IconButton
                                     edge="end"
                                     aria-label="delete"
