@@ -4,7 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import RoleSelection from './pages/RoleSelection';
-import ClientInfo from './pages/ClientInfo';
+import ClientInfo from './pages/ClinetsPages/ClientInfo';
+import ClientMain from './pages/ClinetsPages/ClientsMain';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
 
         {/*Страницы клиента*/}
         <Route path="/client-info" element={<ClientInfo />} />
+        <Route path="/client-main" element={<ClientMain />} />
       </Routes>
     </Router>
   );
