@@ -1,4 +1,4 @@
-// src/pages/RoleSelection.jsx
+//Импорты
 import React, { useState, forwardRef } from 'react';
 import {
   Box,
@@ -13,17 +13,18 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { IMaskInput } from 'react-imask';
-import { Link as RouterLink } from 'react-router-dom'; // Импортируем RouterLink
+import { Link as RouterLink } from 'react-router-dom'; 
 import {
-  Person, // Иконка клиента
-  SportsGymnastics, // Иконка тренера
-  Badge, // Иконка для ФИО
-  Phone, // Иконка для телефона
-  LocationCity, // Иконка для города
-  ArrowForward, // Иконка для кнопки "Продолжить"
-  ArrowBack, // Иконка для кнопки "Назад"
+  Person, 
+  SportsGymnastics, 
+  Badge, 
+  Phone, 
+  LocationCity, 
+  ArrowForward, 
+  ArrowBack,
 } from '@mui/icons-material';
 
+// Маска ввода телефона
 const PhoneMaskInput = forwardRef((props, ref) => {
   const { onChange, ...other } = props;
   return (
@@ -42,12 +43,15 @@ const PhoneMaskInput = forwardRef((props, ref) => {
   );
 });
 
+
+//Временные массивы для проверки фронта без бэка
 const cities = [
   { value: 'moscow', label: 'Москва' },
   { value: 'spb', label: 'Санкт-Петербург' },
   { value: 'kazan', label: 'Казань' },
 ];
 
+//Создание страницы
 const RoleSelection = () => {
   const [role, setRole] = useState('client');
   const [fullName, setFullName] = useState('');

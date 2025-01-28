@@ -1,0 +1,25 @@
+/* Обнуляем все марджины и паддинги */
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box; /* Включаем паддинги и бордеры в ширину и высоту */
+}
+
+/* Нормализуем стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit; /* Наследуем box-sizing от родителя */
+}
+
+/* Убираем переполнение */
+#root {
+    overflow: hidden; /* Скрываем переполняющийся контент */
+}
+
+/* Минимальная высота для html и body */
+html, body, #root {
+    min-height: 100vh;
+}
