@@ -55,7 +55,7 @@ const ClientMap = () => {
       <Button
         variant="contained"
         sx={{ margin: '16px' }}
-        onClick={() => navigate('/halls')}
+        onClick={() => navigate('/client-main/list-gym')}
       >
         Перейти к списку залов
       </Button>

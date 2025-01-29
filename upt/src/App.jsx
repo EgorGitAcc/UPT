@@ -9,6 +9,11 @@ import ClientMain from './pages/ClinetsPage/ClientsMain';
 import ClientNews from './pages/ClinetsPage/ClientsNews';
 import ClientProgram from './pages/ClinetsPage/ClinetProgram'
 import ClientMap from './pages/ClinetsPage/ClinetMap';
+import ClientListGym from './pages/ClinetsPage/ClientListGym';
+import ClientTarinerList from './pages/ClinetsPage/ClientTarinerList'
+import ClientTarinerProfile from './pages/ClinetsPage/ClientTrainerProfile';
+import ClientsTrainerPage from './pages/ClinetsPage/ClientTrainerPage';
+import ClientProfile from './pages/ClinetsPage/ClientProfile';
 
 const App = () => {
   return (
@@ -26,8 +31,13 @@ const App = () => {
           <Route path="news" element={<ClientNews />} />
           <Route path='programs' element={<ClientProgram />} />
           <Route path='map' element={<ClientMap />} />
+          <Route path='list-gym' element={<ClientListGym />} />
+          <Route path='list-trainer' element={<ClientTarinerList />} />
+          <Route path='trainer-profile' element={<ClientTarinerProfile />} />
+          <Route path='trainers' element={<ClientsTrainerPage />} />
+          <Route path='profile' element={<ClientProfile />} />
         </Route>
-      </Routes>
+      </Routes>   
     </Router>
   );
 };

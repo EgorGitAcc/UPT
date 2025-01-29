@@ -45,7 +45,7 @@ const goals = [
     },
 ];
 
-const Workouts = () => {
+const ClinetProgram = () => {
     const [goalsState, setGoalsState] = useState(goals);
     const [selectedGoal, setSelectedGoal] = useState('');
     const [selectedDirections, setSelectedDirections] = useState([]);
@@ -475,4 +475,4 @@ const Workouts = () => {
     );
 };
 
-export default Workouts;
+export default ClinetProgram;

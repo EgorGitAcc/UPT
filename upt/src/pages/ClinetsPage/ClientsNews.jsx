@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent } from '@mui/material';
 
-const NewsPage = () => {
+const ClientsNews = () => {
     const todayNews = [
         { id: 1, title: "Новость 1", description: "Описание новости 1" },
         { id: 2, title: "Новость 2", description: "Описание новости 2" },
@@ -23,7 +23,7 @@ const NewsPage = () => {
             flexDirection="column" 
             alignItems="center" 
             justifyContent="center" 
-            padding={3}
+            padding={5}
             marginTop="10px"
         >
             <Typography variant="h4" gutterBottom>
@@ -41,19 +41,21 @@ const NewsPage = () => {
 
 const NewsSection = ({ title, items }) => {
     return (
-        <Box 
+        <Box  
             display="flex" 
             flexDirection="column" 
             border="1px solid #ccc" 
             borderRadius="8px" 
             overflow="hidden"
+            
         >
             <Typography 
                 variant="h5" 
                 gutterBottom 
                 textAlign="center" 
                 padding={1} 
-                bgcolor="#f5f5f5" 
+                bgcolor="primary.main" 
+                color='primary.contrastText'
                 borderBottom="1px solid #ccc"
             >
                 {title}
@@ -64,11 +66,12 @@ const NewsSection = ({ title, items }) => {
                 padding={2} 
                 display="flex" 
                 flexDirection="column" 
+                color="primary"
                 gap={2}
             >
                 {items.map((item) => (
-                    <Card key={item.id} style={{ marginBottom: "10px" }}>
-                        <CardContent>
+                    <Card  key={item.id} style={{ marginBottom: "10px" }}>
+                        <CardContent >
                             <Typography variant="h6" gutterBottom>
                                 {item.title}
                             </Typography>
@@ -83,4 +86,4 @@ const NewsSection = ({ title, items }) => {
     );
 };
 
-export default NewsPage;
+export default ClientsNews;
