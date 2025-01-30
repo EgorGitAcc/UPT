@@ -14,6 +14,14 @@ import ClientTarinerList from './pages/ClinetsPage/ClientTarinerList'
 import ClientTarinerProfile from './pages/ClinetsPage/ClientTrainerProfile';
 import ClientsTrainerPage from './pages/ClinetsPage/ClientTrainerPage';
 import ClientProfile from './pages/ClinetsPage/ClientProfile';
+import TrainerChoosePlan from './pages/TrainersPage/TrainerChoosePlan';
+import TrainerPay from './pages/TrainersPage/TrainerPay';
+import TrainerInfo from './pages/TrainersPage/TraiberInfo';
+import TrainerMain from './pages/TrainersPage/TrainerMain';
+import TrainerNews from './pages/TrainersPage/TrainerNews';
+import TrainerMap from './pages/TrainersPage/TrainerMap';
+import TrainerClientPage from './pages/TrainersPage/TrainerClientPage';
+import TrainerProfile from './pages/TrainersPage/TrainerProfile';
 
 const App = () => {
   return (
@@ -37,7 +45,19 @@ const App = () => {
           <Route path='trainers' element={<ClientsTrainerPage />} />
           <Route path='profile' element={<ClientProfile />} />
         </Route>
-      </Routes>   
+
+        {/*Стараницы тренера*/}
+        <Route path='trainer-plan' element={<TrainerChoosePlan />} />
+        <Route path='trainer-pay' element={<TrainerPay />} />
+        <Route path='trainer-info' element={<TrainerInfo />} />
+        <Route path="/trainer-main" element={<TrainerMain />}>
+          <Route path="news" element={<TrainerNews />} />
+          <Route path='gym' element={<TrainerMap />} />
+          <Route path='clients' element={<TrainerClientPage />} />
+          <Route path='profile' element={<TrainerProfile />} />
+        </Route>
+
+      </Routes>
     </Router>
   );
 };

@@ -329,7 +329,7 @@ const ClinetProgram = () => {
 
     return (
         <Box height="100%" alignItems="center" display="flex" justifyContent="center">
-            <Stack spacing={2} sx={{ width: '100%', maxWidth: '100%' }}>
+            <Stack spacing={2} sx={{ width: '40%', maxWidth: '100%' }}>
                 <Typography variant="h4" gutterBottom align="center" data-cy="workouts-title">
                     Цели тренировок
                 </Typography>
