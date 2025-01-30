@@ -1,5 +1,5 @@
 // src/pages/Register.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     TextField,
@@ -9,11 +9,64 @@ import {
     Card,
     CardContent,
     InputAdornment,
+    Snackbar,
+    Alert,
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { Email, Lock, Person, LockReset } from '@mui/icons-material';
+import { registerUser } from '../services/register';
+import { loginUser } from '../services/login';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    const [emailAddress, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setSnackbarMessage('Пароли не совпадают');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+            return;
+        }
+
+        try {
+            await registerUser({ emailAddress, password });
+            setSnackbarMessage('Регистрация успешна!');
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+
+            // Автоматическая авторизация после успешной регистрации
+            const loginResponse = await loginUser({ emailAddress, password });
+            localStorage.setItem('accessToken', loginResponse.accessToken);
+            localStorage.setItem('refreshToken', loginResponse.refreshToken);
+            localStorage.setItem('userEmail', emailAddress);
+
+            // Задержка на 1 секунду перед перенаправлением
+            setTimeout(() => {
+                navigate('/role-selection');
+            }, 1000);
+        } catch (err) {
+            setSnackbarMessage(err.message || 'Ошибка регистрации');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+        }
+    };
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbarOpen(false);
+    };
+
     return (
         <Box
             display="flex"
@@ -28,14 +81,15 @@ const Register = () => {
                     <Typography variant="h4" gutterBottom align="center" data-cy="register-title">
                         Регистрация
                     </Typography>
-
                     {/* Поле для почты */}
                     <TextField
                         label="Почта"
-                        type="email"
+                        type="emailAddress"
                         variant="outlined"
                         fullWidth
                         margin="normal"
+                        value={emailAddress}
+                        onChange={(e) => setEmail(e.target.value)}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -43,9 +97,8 @@ const Register = () => {
                                 </InputAdornment>
                             ),
                         }}
-                        inputProps={{ 'data-cy': 'email-input' }} // Селектор для Cypress
+                        inputProps={{ 'data-cy': 'emailAddress-input' }} // Селектор для Cypress
                     />
-
                     {/* Поле для пароля */}
                     <TextField
                         label="Пароль"
@@ -53,6 +106,8 @@ const Register = () => {
                         variant="outlined"
                         fullWidth
                         margin="normal"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -62,7 +117,6 @@ const Register = () => {
                         }}
                         inputProps={{ 'data-cy': 'password-input' }} // Селектор для Cypress
                     />
-
                     {/* Поле для повторения пароля */}
                     <TextField
                         label="Повторите пароль"
@@ -70,6 +124,8 @@ const Register = () => {
                         variant="outlined"
                         fullWidth
                         margin="normal"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -79,7 +135,6 @@ const Register = () => {
                         }}
                         inputProps={{ 'data-cy': 'confirm-password-input' }} // Селектор для Cypress
                     />
-
                     {/* Кнопка "Создать аккаунт" */}
                     <Button
                         variant="contained"
@@ -88,10 +143,10 @@ const Register = () => {
                         sx={{ mt: 2, mb: 2 }}
                         startIcon={<Person color="inherit" />}
                         data-cy="register-button" // Селектор для Cypress
+                        onClick={handleSubmit}
                     >
                         Создать аккаунт
                     </Button>
-
                     {/* Ссылка на страницу входа */}
                     <Typography variant="body2" align="center" sx={{ mt: 2 }}>
                         Уже есть аккаунт?{' '}
@@ -101,6 +156,22 @@ const Register = () => {
                     </Typography>
                 </CardContent>
             </Card>
+
+            {/* Snackbar для уведомлений */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity={snackbarSeverity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
