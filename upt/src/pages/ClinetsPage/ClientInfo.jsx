@@ -21,6 +21,8 @@ import {
     Accessibility,
     Straighten,
 } from '@mui/icons-material';
+import {getAllGenders} from '../../services/infrastucture';
+
 
 const ClientInfo = () => {
     const [gender, setGender] = useState('');

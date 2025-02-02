@@ -17,3 +17,12 @@ export const deleteUserById = async (userId) => {
         throw new Error(error.response ? error.response.data.message : 'Failed to delete user');
     }
 };
+
+export const updateUserById = async (updatedUserData) => {
+    try {
+        const response = await apiClient.put(`${process.env.REACT_APP_API_USER_UPDATE}`, updatedUserData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response ? error.response.data.message : 'Failed to update user');
+    }
+};

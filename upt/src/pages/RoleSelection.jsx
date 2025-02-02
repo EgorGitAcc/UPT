@@ -1,5 +1,4 @@
-// src/pages/RoleSelection.jsx
-import React, { useState, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef, useRef } from 'react';
 import {
     Box,
     TextField,
@@ -11,6 +10,8 @@ import {
     CardContent,
     MenuItem,
     InputAdornment,
+    Snackbar,
+    Alert,
 } from '@mui/material';
 import { IMaskInput } from 'react-imask';
 import { Link as RouterLink } from 'react-router-dom';
@@ -23,7 +24,8 @@ import {
     ArrowForward,
     ArrowBack,
 } from '@mui/icons-material';
-import { getUserByEmail, deleteUserById } from '../services/user';
+import { getUserByEmail, deleteUserById, updateUserById } from '../services/user';
+import {getAllCities } from '../services/infrastucture';
 import { useNavigate } from 'react-router-dom';
 
 // Маска ввода телефона
@@ -32,60 +34,100 @@ const PhoneMaskInput = forwardRef((props, ref) => {
     return (
         <IMaskInput
             {...other}
-            mask="+7 (000) 000-00-00"
+            mask="+{7}(000)000-00-00" // Пример маски для российского номера
             definitions={{
-                '#': /[1-9]/,
+                '0': /[0-9]/
             }}
             inputRef={ref}
-            onAccept={(value) => {
-                onChange({ target: { name: props.name, value } });
-            }}
+            onAccept={(value) => onChange({ target: { name: props.name, value } })}
             overwrite
         />
     );
 });
 
-// Временные массивы для проверки фронта без бэка
-const cities = [
-    { value: 'moscow', label: 'Москва' },
-    { value: 'spb', label: 'Санкт-Петербург' },
-    { value: 'kazan', label: 'Казань' },
-];
-
-// Создание страницы
 const RoleSelection = () => {
     const [role, setRole] = useState('client');
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [city, setCity] = useState('');
+    const [cities, setCities] = useState([]); // Состояние для хранения городов
+    const [avatar, setAvatar] = useState(null); // Состояние для хранения файла аватарки
     const userEmail = localStorage.getItem('userEmail'); // Предполагаем, что email сохранен в localStorage после успешной авторизации
     const navigate = useNavigate();
+    const phoneInputRef = useRef(null);
 
+    // Состояния для управления уведомлениями
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' или 'error'
+
+    const handleContinueClick = async () => {
+        if (userEmail) {
+            try {
+                // Получаем данные пользователя по email
+                const userData = await getUserByEmail(userEmail);
+
+                // Подготавливаем данные для обновления
+                const updatedUserData = {
+                    id: userData.id,
+                    name: fullName,
+                    emailAddress: userEmail,
+                    phoneNumber: phone,
+                    cityId: city, // Предположим, что у нас есть ID города
+                    avatar: avatar ? avatar.split(',')[1] : null // Если аватарка загружена, берем только данные base64 без префикса
+                };
+
+                // Вызываем функцию обновления данных пользователя
+                await updateUserById(updatedUserData);
+
+                // Уведомление об успехе
+                setSnackbarMessage('Данные успешно обновлены!');
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
+
+                if (role === 'client') {
+                    navigate('/client-info'); // Пример страницы для клиента
+                } else if (role === 'trainer') {
+                    navigate('/trainer-plan'); // Пример страницы для тренера
+                }
+            } catch (error) {
+                // Уведомление об ошибке
+                setSnackbarMessage(`Ошибка при обновлении данных пользователя: ${error.message}`);
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
+                console.error('Ошибка при обновлении данных пользователя:', error.message);
+            }
+        }
+    };
+
+    // Обработчик изменения роли
     const handleRoleChange = (event, newRole) => {
         if (newRole !== null) {
             setRole(newRole);
         }
     };
 
+    // Обработчик кнопки "Назад"
     const handleBackClick = async () => {
         if (userEmail) {
             try {
                 // Получаем данные пользователя по email
                 const userData = await getUserByEmail(userEmail);
-
                 // Удаляем пользователя по id
                 if (userData.id) {
                     await deleteUserById(userData.id);
                 }
-
                 // Очищаем localStorage
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
                 localStorage.removeItem('userEmail');
-
                 // Перенаправляем на страницу регистрации
                 navigate('/register');
             } catch (error) {
+                // Уведомление об ошибке
+                setSnackbarMessage(`Ошибка при удалении пользователя: ${error.message}`);
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
                 console.error('Ошибка при удалении пользователя:', error.message);
             }
         } else {
@@ -93,15 +135,53 @@ const RoleSelection = () => {
         }
     };
 
+    // Загружаем города при монтировании компонента
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const citiesData = await getAllCities();
+                setCities(citiesData);
+            } catch (error) {
+                // Уведомление об ошибке
+                setSnackbarMessage(`Ошибка при получении городов: ${error.message}`);
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
+                console.error('Ошибка при получении городов:', error.message);
+            }
+        };
+        fetchCities();
+    }, []);
+
+    // Функция обработки изменения файла
+    const handleAvatarChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatar(reader.result); // Сохраняем данные изображения в состояние
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Закрытие Snackbar
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false);
+    };
+
     return (
         <Box
             display="flex"
-            flexDirection="column"
+            flexDirection="row"
             alignItems="center"
             justifyContent="center"
             minHeight="100vh"
             sx={{ backgroundColor: '#f5f5f5' }}
         >
+            {/* Блок с формой */}
             <Card sx={{ width: '400px', padding: '20px', borderRadius: '10px' }}>
                 <CardContent>
                     {/* Кнопка "Назад" */}
@@ -136,6 +216,30 @@ const RoleSelection = () => {
                             Я тренер
                         </ToggleButton>
                     </ToggleButtonGroup>
+                    <div style={{ display: 'flex', alignItems: 'center', marginTop: '15px', marginBottom: '20px' }}> {/* Flexbox для выравнивания элементов по горизонтали */}
+
+                        <div style={{ position: 'relative', marginRight: '30px' }}>
+                            {avatar ? (
+                                <img src={avatar} alt="Avatar Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '50%' }} />
+                            ) : (
+                                <div style={{ width: '80px', height: '80px', backgroundColor: '#e0e0e0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Person color="primary" fontSize="large" />
+                                </div>
+                            )}
+                        </div>
+                        <input
+                            accept="image/*"
+                            type="file"
+                            onChange={handleAvatarChange}
+                            style={{ display: 'none' }}
+                            id="avatar-upload"
+                        />
+                        <label htmlFor="avatar-upload">
+                            <Button variant="contained" component="span" startIcon={<Person />} sx={{ marginTop: '10px', width: 'auto', }}>
+                                Загрузить аватарку
+                            </Button>
+                        </label>
+                    </div>
                     {/* Поле ФИО с иконкой */}
                     <TextField
                         label="Ваше ФИО"
@@ -169,6 +273,7 @@ const RoleSelection = () => {
                             ),
                             inputComponent: PhoneMaskInput,
                         }}
+                        inputRef={phoneInputRef}
                         inputProps={{ 'data-cy': 'phone-input' }}
                     />
                     {/* Выпадающий список городов с иконкой */}
@@ -178,8 +283,8 @@ const RoleSelection = () => {
                         variant="outlined"
                         fullWidth
                         margin="normal"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
+                        value={city} // Здесь city будет хранить id выбранного города
+                        onChange={(e) => setCity(e.target.value)} // При изменении значения будет устанавливаться id города
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -190,8 +295,8 @@ const RoleSelection = () => {
                         inputProps={{ 'data-cy': 'city-select' }}
                     >
                         {cities.map((option) => (
-                            <MenuItem key={option.value} value={option.value} data-cy={`city-option-${option.value}`}>
-                                {option.label}
+                            <MenuItem key={option.id} value={option.id} data-cy={`city-option-${option.id}`}>
+                                {option.name} {/* Отображаем название города */}
                             </MenuItem>
                         ))}
                     </TextField>
@@ -200,6 +305,7 @@ const RoleSelection = () => {
                         variant="contained"
                         color="primary"
                         fullWidth
+                        onClick={handleContinueClick}
                         sx={{ mt: 3 }}
                         endIcon={<ArrowForward />}
                         data-cy="submit-button"
@@ -208,6 +314,18 @@ const RoleSelection = () => {
                     </Button>
                 </CardContent>
             </Card>
+
+            {/* Snackbar для уведомлений */}
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

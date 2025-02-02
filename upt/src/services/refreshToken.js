@@ -1,5 +1,4 @@
-// src/services/refreshToken.js
-import apiClient from '../axiosConfig';
+import axios from 'axios';
 
 export const refreshToken = async () => {
     try {
@@ -8,9 +7,23 @@ export const refreshToken = async () => {
             throw new Error('No refresh token found');
         }
 
-        const response = await apiClient.post(process.env.REACT_APP_API_REFRESH_TOKEN, { refreshToken });
+        console.log('Attempting to refresh token...');
+        const response = await axios.post(
+            `${process.env.REACT_APP_API_BASE_URL}${process.env.REACT_APP_API_REFRESH_TOKEN}`,
+            { refreshToken },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        console.log('Refresh token response:', response.data);
         return response.data;
     } catch (error) {
+        console.error('Failed to refresh token:', error);
         throw new Error(error.response ? error.response.data.message : 'Failed to refresh token');
     }
 };
+
+export default refreshToken;

@@ -24,6 +24,7 @@ import TrainerClientPage from './pages/TrainersPage/TrainerClientPage';
 import TrainerProfile from './pages/TrainersPage/TrainerProfile';
 
 const App = () => {
+
   return (
     <Router>
       <Routes>
