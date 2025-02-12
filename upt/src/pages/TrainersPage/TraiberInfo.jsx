@@ -57,15 +57,6 @@ const TrainerInfo = () => {
             sx={{ backgroundColor: '#f5f5f5' }}>
             <Card sx={{ width: '600px', padding: '20px', borderRadius: '10px' }}>
                 <CardContent>
-                <Button
-                        component={RouterLink}
-                        to="/trainer-pay"
-                        startIcon={<ArrowBack />}
-                        sx={{ mt: 2, mb: 2 }}
-                        data-cy="back-button"
-                    >
-                        Назад
-                    </Button>
                     <Typography variant="h4" align='center' gutterBottom>Информация о тренере</Typography>
                     <Box maxWidth={600} width="100%" display="flex" flexDirection="column" gap={2}>
                         <TextField fullWidth label="ФИО" name="fullName" value={trainerData.fullName} onChange={handleChange}/>

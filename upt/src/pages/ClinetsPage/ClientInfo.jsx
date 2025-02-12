@@ -167,15 +167,6 @@ const ClientInfo = () => {
             sx={{ backgroundColor: '#f5f5f5' }}
         >
             <Box sx={{ width: '600px', padding: '20px', borderRadius: '10px', backgroundColor: 'white' }}>
-                <Button
-                    component={RouterLink}
-                    to="/role-selection"
-                    startIcon={<ArrowBack />}
-                    sx={{ mt: 2, mb: 2 }}
-                    data-cy="back-button"
-                >
-                    Назад
-                </Button>
                 <Typography variant="h4" gutterBottom align="center" data-cy="client-info-title">
                     Дополнительная информация
                 </Typography>

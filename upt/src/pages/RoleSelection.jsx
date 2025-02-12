@@ -184,17 +184,7 @@ const RoleSelection = () => {
             {/* Блок с формой */}
             <Card sx={{ width: '400px', padding: '20px', borderRadius: '10px' }}>
                 <CardContent>
-                    {/* Кнопка "Назад" */}
-                    <Button
-                        component={RouterLink}
-                        to="/register"
-                        startIcon={<ArrowBack />} // Иконка стрелки назад
-                        sx={{ mb: 2 }}
-                        data-cy="back-button"
-                        onClick={handleBackClick} // Добавляем обработчик события onClick
-                    >
-                        Назад
-                    </Button>
+                
                     <Typography variant="h4" gutterBottom align="center" data-cy="role-selection-title">
                         Выбор роли
                     </Typography>

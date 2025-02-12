@@ -51,10 +51,10 @@ const ClientMap = () => {
   };
 
   return (
-    <Box marginTop="50px" height="80%" >
+    <Box marginTop="50px" height="800px" >
       <Button
         variant="contained"
-        sx={{ margin: '16px' }}
+        sx={{ margin: '16px'}}
         onClick={() => navigate('/client-main/list-gym')}
       >
         Перейти к списку залов
@@ -63,7 +63,7 @@ const ClientMap = () => {
       <Box
         ref={mapContainerRef}
         sx={{
-  
+          height:'600px',
           margin: '0 auto', // Центрируем карту по горизонтали
           border: '1px solid #ccc', // Добавляем рамку для визуализации
           borderRadius: '8px', // Скругляем углы

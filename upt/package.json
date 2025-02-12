@@ -16,7 +16,8 @@
     "react-scripts": "5.0.1"
   },
   "scripts": {
-    "upt": "react-scripts start"
+    "upt": "react-scripts start",
+    "upt_build": "react-scripts build"
   },
   "eslintConfig": {
     "extends": [
