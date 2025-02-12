@@ -10,6 +10,7 @@ export const getUserByEmail = async (email) => {
     }
 };
 
+
 export const deleteUserById = async (userId) => {
     try {
         await apiClient.delete(`${process.env.REACT_APP_API_USER_DELETE}?id=${userId}`);

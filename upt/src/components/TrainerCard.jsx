@@ -20,7 +20,6 @@ const TrainerCard = ({ trainer }) => {
     return (
         <Card
             sx={{
-                height: '100%', // Карточка занимает всю высоту контейнера
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between', // Равномерное распределение контента
@@ -31,8 +30,6 @@ const TrainerCard = ({ trainer }) => {
             <IconButton
                 sx={{
                     position: 'absolute',
-                    top: 8,
-                    right: 8,
                     backgroundColor: 'rgba(255, 255, 255, 0.8)', // Полупрозрачный фон
                     '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 1)', // Непрозрачный фон при наведении
@@ -48,7 +45,7 @@ const TrainerCard = ({ trainer }) => {
                     <Avatar
                         src={trainer.avatar}
                         alt={trainer.name}
-                        sx={{ width: 80, height: 80, mr: 2 }}
+                        sx={{mr: 2 }}
                     />
                     <Box>
                         <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>

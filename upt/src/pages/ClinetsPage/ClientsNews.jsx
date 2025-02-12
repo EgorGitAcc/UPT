@@ -1,28 +1,66 @@
-import React from 'react';
-import { Box, Typography, Card, CardContent } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import {
+    Box,
+    Typography,
+    ToggleButton,
+    ToggleButtonGroup,
+    List,
+    ListItem,
+    ListItemText,
+} from '@mui/material';
+import { getAllNews } from '../../services/news'; // Импортируем метод для получения новостей
 
 const ClientsNews = () => {
-    const todayNews = [
-        { id: 1, title: "Новость 1", description: "Описание новости 1" },
-        { id: 2, title: "Новость 2", description: "Описание новости 2" },
-    ];
+    const [todayNews, setTodayNews] = useState([]); // Новости за сегодня
+    const [weeklyNews, setWeeklyNews] = useState([]); // Новости за неделю
+    const [monthlyNews, setMonthlyNews] = useState([]); // Новости за месяц
+    const [selectedSection, setSelectedSection] = useState('today'); // Состояние для выбранного раздела
 
-    const weeklyNews = [
-        { id: 3, title: "Новость 3", description: "Описание новости 3" },
-        { id: 4, title: "Новость 4", description: "Описание новости 4" },
-    ];
+    useEffect(() => {
+        const fetchNews = async () => {
+            try {
+                const allNews = await getAllNews(); // Получаем все новости
 
-    const monthlyNews = [
-        { id: 5, title: "Новость 5", description: "Описание новости 5" },
-        { id: 6, title: "Новость 6", description: "Описание новости 6" },
-    ];
+                // Разделяем новости по датам
+                const now = new Date();
+                const todayStart = new Date(now.setHours(0, 0, 0, 0));
+                const weekStart = new Date(now.setDate(now.getDate() - 7));
+                const monthStart = new Date(now.setMonth(now.getMonth() - 1));
+
+                const todayItems = [];
+                const weeklyItems = [];
+                const monthlyItems = [];
+
+                allNews.forEach((item) => {
+                    const creationDate = new Date(item.creationDate);
+
+                    if (creationDate >= todayStart) {
+                        todayItems.push(item);
+                    } else if (creationDate >= weekStart) {
+                        weeklyItems.push(item);
+                    } else if (creationDate >= monthStart) {
+                        monthlyItems.push(item);
+                    }
+                });
+
+                // Устанавливаем состояния
+                setTodayNews(todayItems);
+                setWeeklyNews(weeklyItems);
+                setMonthlyNews(monthlyItems);
+            } catch (error) {
+                console.error('Ошибка при получении новостей:', error.message);
+            }
+        };
+
+        fetchNews(); // Вызываем функцию загрузки новостей
+    }, []);
 
     return (
-        <Box 
-            display="flex" 
-            flexDirection="column" 
-            alignItems="center" 
-            justifyContent="center" 
+        <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
             padding={5}
             marginTop="10px"
         >
@@ -30,57 +68,112 @@ const ClientsNews = () => {
                 Новости
             </Typography>
 
-            <Box display="flex" flexDirection="column" gap={4} width="100%" maxWidth="800px">
-                <NewsSection title="Новости сегодня" items={todayNews} />
-                <NewsSection title="Новости недели" items={weeklyNews} />
-                <NewsSection title="Новости месяца" items={monthlyNews} />
-            </Box>
-        </Box>
-    );
-};
+            {/* Переключатель разделов */}
+            <ToggleButtonGroup
+                value={selectedSection}
+                exclusive
+                onChange={(e, newValue) => setSelectedSection(newValue)}
+                aria-label="Выбор раздела новостей"
+                sx={{ mb: 2 }}
+            >
+                <ToggleButton value="today">Сегодня</ToggleButton>
+                <ToggleButton value="weekly">Неделя</ToggleButton>
+                <ToggleButton value="monthly">Месяц</ToggleButton>
+            </ToggleButtonGroup>
 
-const NewsSection = ({ title, items }) => {
-    return (
-        <Box  
-            display="flex" 
-            flexDirection="column" 
-            border="1px solid #ccc" 
-            borderRadius="8px" 
-            overflow="hidden"
-            
-        >
-            <Typography 
-                variant="h5" 
-                gutterBottom 
-                textAlign="center" 
-                padding={1} 
-                bgcolor="primary.main" 
-                color='primary.contrastText'
-                borderBottom="1px solid #ccc"
-            >
-                {title}
-            </Typography>
-            <Box 
-                maxHeight="300px" 
-                overflow="auto" 
-                padding={2} 
-                display="flex" 
-                flexDirection="column" 
-                color="primary"
-                gap={2}
-            >
-                {items.map((item) => (
-                    <Card  key={item.id} style={{ marginBottom: "10px" }}>
-                        <CardContent >
-                            <Typography variant="h6" gutterBottom>
-                                {item.title}
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                                {item.description}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                ))}
+            {/* Отображение новостей для выбранного раздела */}
+            <Box width="100%" maxWidth="800px" >
+                {/* Блок "Новости сегодня" */}
+                {selectedSection === 'today' && (
+                    <Box
+                        border="1px solid #ccc"
+                        borderRadius="8px"
+                        overflow="hidden"
+
+                    >
+                        <Typography
+                            variant="h5"
+                            gutterBottom
+                            textAlign="center"
+                            padding={1}
+                            bgcolor="primary.main"
+                            color="primary.contrastText"
+                            borderBottom="1px solid #ccc"
+                        >
+                            Новости сегодня
+                        </Typography>
+                        <List>
+                            {todayNews.map((item) => (
+                                <ListItem key={item.id} divider>
+                                    <ListItemText
+                                        primary={item.name}
+                                        secondary={item.text}
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+                )}
+
+                {selectedSection === 'weekly' && (
+                    <Box
+                        border="1px solid #ccc"
+                        borderRadius="8px"
+                        overflow="hidden"
+                    >
+                        <Typography
+                            variant="h5"
+                            gutterBottom
+                            textAlign="center"
+                            padding={1}
+                            bgcolor="primary.main"
+                            color="primary.contrastText"
+                            borderBottom="1px solid #ccc"
+                        >
+                            Новости недели
+                        </Typography>
+                        <List>
+                            {weeklyNews.map((item) => (
+                                <ListItem key={item.id} divider>
+                                    <ListItemText
+                                        primary={item.name}
+                                        secondary={item.text}
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+                )}
+
+                {selectedSection === 'monthly' && (
+                    <Box
+                        border="1px solid #ccc"
+                        borderRadius="8px"
+                        overflow="hidden"
+                    >
+                        <Typography
+                            variant="h5"
+                            gutterBottom
+                            textAlign="center"
+                            padding={1}
+                            bgcolor="primary.main"
+                            color="primary.contrastText"
+                            borderBottom="1px solid #ccc"
+                        >
+                            Новости месяца
+                        </Typography>
+                        <List>
+                            {monthlyNews.map((item) => (
+                                <ListItem key={item.id} divider>
+                                    <ListItemText
+                                        primary={item.name}
+                                        secondary={item.text}
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+                )}
             </Box>
         </Box>
     );

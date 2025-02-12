@@ -15,6 +15,10 @@ import {
 import { Link as RouterLink } from 'react-router-dom';
 import { Email, Lock, Person } from '@mui/icons-material';
 import { loginUser } from '../services/login';
+import { getUserByEmail } from '../services/user';
+import { getClientById } from '../services/clients';
+import { getTrainerById } from '../services/trainer';
+
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -27,22 +31,53 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
+            // Выполняем авторизацию
             const loginResponse = await loginUser({ emailAddress, password });
 
-            // Сохранение токенов в localStorage
+            // Сохраняем токены в localStorage
             localStorage.setItem('accessToken', loginResponse.accessToken);
             localStorage.setItem('refreshToken', loginResponse.refreshToken);
             localStorage.setItem('userEmail', emailAddress);
 
+            // Получаем ID пользователя по email
+            const userIdResponse = await getUserByEmail(emailAddress); // Предполагается, что такой метод уже существует
+            const userId = userIdResponse.id;
+
+            if (!userId) {
+                throw new Error('Пользователь не найден');
+            }
+
+            // Проверяем, является ли пользователь клиентом
+            let isClient = false;
+            try {
+                await getClientById(userId);
+                isClient = true;
+            } catch (error) {
+                console.log('Пользователь не является клиентом:', error.message);
+            }
+
+            // Если пользователь не клиент, проверяем, является ли он тренером
+            if (!isClient) {
+                try {
+                    await getTrainerById(userId);
+                } catch (error) {
+                    throw new Error('Пользователь не является ни клиентом, ни тренером');
+                }
+            }
+
+            // Уведомление об успешной авторизации
             setSnackbarMessage('Авторизация успешна!');
             setSnackbarSeverity('success');
             setSnackbarOpen(true);
 
-            // Перенаправление на страницу выбора роли
+            // Перенаправляем пользователя на соответствующую страницу
             setTimeout(() => {
-                navigate('/role-selection');
+                if (isClient) {
+                    navigate('/client-main'); // Страница клиента
+                } else {
+                    navigate('/trainer-main'); // Страница тренера
+                }
             }, 1000);
         } catch (err) {
             setSnackbarMessage(err.message || 'Ошибка авторизации');
@@ -75,7 +110,7 @@ const Login = () => {
                     {/* Поле для почты */}
                     <TextField
                         label="Почта"
-                        type="emailAddress"
+                        type="email"
                         variant="outlined"
                         fullWidth
                         margin="normal"
@@ -135,7 +170,6 @@ const Login = () => {
                     </Typography>
                 </CardContent>
             </Card>
-
             {/* Snackbar для уведомлений */}
             <Snackbar
                 open={snackbarOpen}
@@ -143,11 +177,7 @@ const Login = () => {
                 onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
-                <Alert
-                    onClose={handleCloseSnackbar}
-                    severity={snackbarSeverity}
-                    sx={{ width: '100%' }}
-                >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

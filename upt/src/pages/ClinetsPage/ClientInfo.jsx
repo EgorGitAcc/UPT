@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     TextField,
@@ -9,7 +9,14 @@ import {
     InputLabel,
     FormControl,
     InputAdornment,
+    Snackbar,
+    Alert
 } from '@mui/material';
+import { getAllGenders } from '../../services/Infrastructure.js';
+import { getUserByEmail, updateUserById } from '../../services/user';
+import { addClient } from '../../services/clients.js';
+import { getAllCities } from '../../services/city';
+import { useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import {
     ArrowBack,
@@ -19,13 +26,11 @@ import {
     Female,
     Male,
     Accessibility,
-    Straighten,
+    Straighten
 } from '@mui/icons-material';
-import {getAllGenders} from '../../services/infrastucture';
-
 
 const ClientInfo = () => {
-    const [gender, setGender] = useState('');
+    const [gender, setGender] = useState(''); // Состояние для выбранного пола
     const [height, setHeight] = useState('');
     const [weight, setWeight] = useState('');
     const [chest, setChest] = useState('');
@@ -33,6 +38,124 @@ const ClientInfo = () => {
     const [stomach, setStomach] = useState('');
     const [hips, setHips] = useState('');
     const [thighs, setThighs] = useState('');
+    const [genders, setGenders] = useState([]); // Состояние для хранения списка полов
+    const genderTranslations = {
+        "None": "Не указано",
+        "Male": "Мужской",
+        "Female": "Женский"
+    };
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); 
+    const navigate = useNavigate();
+    // Загружаем список полов при монтировании компонента
+    useEffect(() => {
+        const fetchGenders = async () => {
+            try {
+                const gendersData = await getAllGenders();
+                const genders = Object.entries(gendersData).map(([id, label]) => ({
+                    id: id,
+                    label: label
+                }));
+                setGenders(genders);
+            } catch (error) {
+                console.error('Ошибка при получении списка полов:', error);
+            }
+        };
+
+        fetchGenders();
+    }, []);
+
+    const fetchUserCityName = async (userEmail) => {
+        try {
+            // Получаем данные пользователя по email
+            const userData = await getUserByEmail(userEmail);
+
+            // Если нет данных пользователя или cityId не определен, возвращаем null
+            if (!userData || !userData.city) return null;
+
+            const userCityId = userData.city; // Извлекаем cityId из данных пользователя
+
+            // Получаем список всех городов
+            const citiesData = await getAllCities();
+
+            // Находим город по cityId и возвращаем его название
+            const userCity = citiesData.find(city => city.name === userCityId);
+            return userCity ? userCity.id : 'Город не найден'; // Возвращаем название города или сообщение об ошибке
+        } catch (error) {
+            console.error('Ошибка при получении названия города:', error.message);
+            return 'Ошибка получения города';
+        }
+    };
+
+    const handleNextClick = async () => {
+        const userEmail = localStorage.getItem('userEmail'); // Получаем email из localStorage
+
+        if (!userEmail) {
+            console.error('Email пользователя не найден');
+            alert('Произошла ошибка. Пожалуйста, авторизуйтесь снова.');
+            return;
+        }
+
+        try {
+            // Получаем данные пользователя по email
+            const userData = await getUserByEmail(userEmail);
+
+            // Извлекаем ID города, имя и телефон пользователя
+            const cityId = await fetchUserCityName(userEmail);
+            const userFullName = userData.name;
+            const userPhone = userData.phoneNumber;
+
+            // Подготавливаем данные для обновления
+            const updatedUserData = {
+                id: userData.id, // ID пользователя
+                name: userFullName, // Передаем существующее имя
+                phoneNumber: userPhone, // Передаем существующий телефон
+                gender: gender, // Обновляем выбранный гендер
+                cityId: cityId, // Сохраняем существующий ID города
+                emailAddress: userEmail // Передаем email пользователя
+            };
+
+            // Вызываем функцию обновления данных пользователя
+            await updateUserById(updatedUserData);
+
+            // Дополнительная логика: вызов метода addClient
+            const clientData = {
+                userId: userData.id, // ID пользователя
+                height: height, // Рост
+                weight: weight, // Вес
+                chest: chest, // Объем груди
+                waist: waist, // Объем талии
+                stomach: stomach, // Объем живота
+                hips: hips, // Объем ягодиц
+                thighs: thighs // Объем бедер
+            };
+
+            // Вызываем метод addClient для создания клиента
+            await addClient(clientData);
+            navigate('/client-main')
+
+            showSnackbar('Данные успешно обновлены и клиент добавлен!', 'success');
+        } catch (error) {
+            console.error('Ошибка при обновлении данных или добавлении клиента:', error.message);
+            showSnackbar(`Ошибка`, 'error');
+        }
+    };
+    // Функция для показа уведомления
+    const showSnackbar = (message, severity) => {
+        setSnackbarMessage(message);
+        setSnackbarSeverity(severity);
+        setOpenSnackbar(true);
+    };
+
+    // Закрытие Snackbar
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false);
+    };
+
 
     return (
         <Box
@@ -69,13 +192,25 @@ const ClientInfo = () => {
                         inputProps={{ 'data-cy': 'gender-select' }}
                         startAdornment={
                             <InputAdornment position="start">
-                                {gender === 'male' ? <Male color="primary" /> : gender === 'female' ? <Female color="primary" /> : <Accessibility color="primary" />}
+                                {gender === 'male' ? (
+                                    <Male color="primary" />
+                                ) : gender === 'female' ? (
+                                    <Female color="primary" />
+                                ) : (
+                                    <Accessibility color="primary" />
+                                )}
                             </InputAdornment>
                         }
                     >
-                        <MenuItem value="male">Мужской</MenuItem>
-                        <MenuItem value="female">Женский</MenuItem>
-                        <MenuItem value="other">Другой</MenuItem>
+                        {genders.map((gender) => (
+                            <MenuItem
+                                key={gender.id}
+                                value={gender.label} // Оригинальное значение (например, "Male")
+                                data-cy={`gender-option-${gender.label}`}
+                            >
+                                {genderTranslations[gender.label] || gender.label}
+                            </MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
 
@@ -92,7 +227,7 @@ const ClientInfo = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <Height color="primary"/>
+                                <Height color="primary" />
                             </InputAdornment>
                         ),
                     }}
@@ -111,7 +246,7 @@ const ClientInfo = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <MonitorWeight color="primary"/>
+                                <MonitorWeight color="primary" />
                             </InputAdornment>
                         ),
                     }}
@@ -130,7 +265,7 @@ const ClientInfo = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <Straighten color="primary"/>
+                                <Straighten color="primary" />
                             </InputAdornment>
                         ),
                     }}
@@ -149,7 +284,7 @@ const ClientInfo = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <Straighten color="primary"/>
+                                <Straighten color="primary" />
                             </InputAdornment>
                         ),
                     }}
@@ -168,7 +303,7 @@ const ClientInfo = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <Straighten color="primary"/>
+                                <Straighten color="primary" />
                             </InputAdornment>
                         ),
                     }}
@@ -187,7 +322,7 @@ const ClientInfo = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <Straighten color="primary"/>
+                                <Straighten color="primary" />
                             </InputAdornment>
                         ),
                     }}
@@ -206,7 +341,7 @@ const ClientInfo = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <Straighten color="primary"/>
+                                <Straighten color="primary" />
                             </InputAdornment>
                         ),
                     }}
@@ -215,14 +350,23 @@ const ClientInfo = () => {
                 {/* Кнопка "Далее" */}
                 <Button
                     variant="contained"
-                    color="primary"
-                    fullWidth
-                    sx={{ mt: 2, mb: 2 }}
                     endIcon={<ArrowForward />}
+                    sx={{ mt: 2 }}
                     data-cy="next-button"
+                    onClick={handleNextClick} // Добавляем обработчик события
                 >
                     Далее
                 </Button>
+                {/* Уведомление Snackbar */}
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                >
+                    <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
             </Box>
         </Box>
     );

@@ -25,7 +25,7 @@ import {
     ArrowBack,
 } from '@mui/icons-material';
 import { getUserByEmail, deleteUserById, updateUserById } from '../services/user';
-import {getAllCities } from '../services/infrastucture';
+import {getAllCities } from '../services/city';
 import { useNavigate } from 'react-router-dom';
 
 // Маска ввода телефона

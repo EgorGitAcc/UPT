@@ -51,7 +51,7 @@ const ClientMap = () => {
   };
 
   return (
-    <Box marginTop="50px" height="80%" sx={{ width: '100%' }}>
+    <Box marginTop="50px" height="80%" >
       <Button
         variant="contained"
         sx={{ margin: '16px' }}
@@ -63,8 +63,7 @@ const ClientMap = () => {
       <Box
         ref={mapContainerRef}
         sx={{
-          height: '600px', // Устанавливаем высоту карты
-          width: '1200px',  // Устанавливаем ширину карты
+  
           margin: '0 auto', // Центрируем карту по горизонтали
           border: '1px solid #ccc', // Добавляем рамку для визуализации
           borderRadius: '8px', // Скругляем углы

@@ -20,6 +20,7 @@ import {
     ListItemText,
     ListItemSecondaryAction,
     IconButton,
+    TextField
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -53,7 +54,8 @@ const ClinetProgram = () => {
     const [selectedDays, setSelectedDays] = useState([]);
     const [selectedTimes, setSelectedTimes] = useState([]);
     const [injury, setInjury] = useState('');
-
+    const [currentWeight, setCurrentWeight] = useState('');
+    const [desiredWeight, setDesiredWeight] = useState('');
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
 
@@ -323,6 +325,29 @@ const ClinetProgram = () => {
                         </Grid>
                     </Grid>
                 </div>
+            ),
+        },
+        {
+            label: 'Дополнительные параметры',
+            content: (
+                <Box>
+                    {/* Существующее содержимое третьего шага */}
+                    <Typography variant="subtitle1">Вес:</Typography>
+                    <TextField
+                        label="Текущий вес"
+                        value={currentWeight}
+                        onChange={(e) => setCurrentWeight(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Желаемый вес"
+                        value={desiredWeight}
+                        onChange={(e) => setDesiredWeight(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                </Box>
             ),
         },
     ];
